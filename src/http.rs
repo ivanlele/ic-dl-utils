@@ -4,9 +4,9 @@ const CONSENCUS_ERROR: &str = "The http_request resulted into error. RejectionCo
 #[macro_export]
 macro_rules! retry_until_success {
     ($func:expr, $($arg:expr),*) => {{
-        let mut result = $func($($args),*);
+        let mut result = $func($($args),*).await;
         while result.is_err() && format!("{:?}", result.unwrap_err()).contains(CONSENCUS_ERROR) {
-            let mut result = $func($($args),*);
+            result = $func($($args),*).await;
         }
 
         result
