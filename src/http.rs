@@ -8,7 +8,7 @@ macro_rules! retry_until_success {
             attempts += 1;
         }
 
-        let (func_name, _) = stringify!($func).split_once("(").unwrap();
+        let (func_name, _) = stringify!($func).rsplit_once("(").unwrap();
 
         ic_utils::logger::log_message(format!("[{func_name}] used attempts: {attempts}"));
 
