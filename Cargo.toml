@@ -8,8 +8,8 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.71"
 ic-cdk = "0.7.4"
-ic-web3 = "0.1.7"
 ic-utils = { package = "canistergeek_ic_rust", version = "0.3.1" }
+ic-web3 = { git = "https://github.com/ivanlele/ic-web3", branch="dev" }
 
 [dev-dependencies]
 tokio = { version = "1.28.2", features = ["macros", "rt"]}
