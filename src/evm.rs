@@ -14,7 +14,7 @@ pub async fn wait_for_success_confirmation(
     w3: &Web3<ICHttp>,
     tx_hash: &H256,
     timeout: u64,
-) -> Result<()> {
+) -> Result<TransactionReceipt> {
     let receipt = wait_for_confirmation(w3, tx_hash, timeout)
         .await?;
 
@@ -27,7 +27,7 @@ pub async fn wait_for_success_confirmation(
         return Err(anyhow!("tx has failed"));
     } 
 
-    Ok(())
+    Ok(receipt)
 }
 
 pub async fn wait_for_confirmation(
