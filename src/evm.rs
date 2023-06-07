@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result, Context};
 
-use ic_web3::{types::{H256, TransactionReceipt}, Web3, transports::ICHttp};
+use ic_web3::{Transport, types::{H256, TransactionReceipt}, Web3};
 use ic_cdk::api::time;
 
 const TX_SUCCESS_STATUS: u64 = 1;
@@ -10,8 +10,8 @@ pub fn time_in_seconds() -> u64 {
     time() / 1_000_000_000
 }
 
-pub async fn wait_for_success_confirmation(
-    w3: &Web3<ICHttp>,
+pub async fn wait_for_success_confirmation<T: Transport>(
+    w3: &Web3<T>,
     tx_hash: &H256,
     timeout: u64,
 ) -> Result<TransactionReceipt> {
@@ -25,13 +25,13 @@ pub async fn wait_for_success_confirmation(
 
     if tx_status != TX_SUCCESS_STATUS {
         return Err(anyhow!("tx has failed"));
-    } 
+    }
 
     Ok(receipt)
 }
 
-pub async fn wait_for_confirmation(
-    w3: &Web3<ICHttp>,
+pub async fn wait_for_confirmation<T: Transport>(
+    w3: &Web3<T>,
     tx_hash: &H256,
     timeout: u64,
 ) -> Result<TransactionReceipt> {
