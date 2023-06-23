@@ -5,8 +5,8 @@ macro_rules! retry_until_success {
         let mut result = $func.await;
 
         while result.is_err() 
-            && format!("{:?}", result.as_ref().unwrap_err()).contains("The http_request resulted into error. RejectionCode: SysTransient, Error: Canister http responses were different across replicas, and no consensus was reached")
-            || format!("{:?}", result.as_ref().unwrap_err()).contains("insufficient funds for gas * price + value") {
+            && (format!("{:?}", result.as_ref().unwrap_err()).contains("The http_request resulted into error. RejectionCode: SysTransient, Error: Canister http responses were different across replicas, and no consensus was reached")
+            || format!("{:?}", result.as_ref().unwrap_err()).contains("insufficient funds for gas * price + value")) {
             result = $func.await;
             attempts += 1;
         }        
