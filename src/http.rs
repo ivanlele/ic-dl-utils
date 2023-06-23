@@ -37,6 +37,8 @@ macro_rules! retry_with_unhandled {
             if format_error.contains("insufficient funds for gas * price + value") {
                 is_unhandled_error = true;
             }
+            
+            break;
         }        
 
         let (func_name, _) = stringify!($func).rsplit_once("(").unwrap();
