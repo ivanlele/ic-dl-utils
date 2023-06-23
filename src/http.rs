@@ -2,22 +2,46 @@
 macro_rules! retry_until_success {
     ($func:expr) => {{
         let mut attempts = 1;
-        let mut result = $func.await;
-
-        let (func_name, _) = stringify!($func).rsplit_once("(").unwrap();
+        let mut result = $func.await;        
 
         while result.is_err() 
-            && (format!("{:?}", result.as_ref().unwrap_err()).contains("The http_request resulted into error. RejectionCode: SysTransient, Error: Canister http responses were different across replicas, and no consensus was reached")
-            || format!("{:?}", result.as_ref().unwrap_err()).contains("insufficient funds for gas * price + value")) {
+            && format!("{:?}", result.as_ref().unwrap_err()).contains("Canister http responses were different across replicas") {
             result = $func.await;
-            ic_cdk::println!("[{func_name}] use attempts: {attempts}");
             attempts += 1;
         }        
 
+        let (func_name, _) = stringify!($func).rsplit_once("(").unwrap();
+
         ic_utils::logger::log_message(format!("[{func_name}] used attempts: {attempts}"));
-        ic_cdk::println!("[{func_name}] used attempts: {attempts}");
 
         result
+    }}
+}
+
+#[macro_export]
+macro_rules! retry_with_unhandled {
+    ($func:expr) => {{
+        let mut attempts = 1;
+        let mut result = $func.await;        
+
+        let mut is_unhandled_error = false;
+
+        while let Err(err) = result { 
+            let format_error = format!("{err:?}");
+            if format_error.contains("Canister http responses were different across replicas") {
+                result = $func.await;
+                attempts += 1;
+                continue;
+            }
+            if format_error.contraint("insufficient funds for gas * price + value")
+            is_unhandled_error = true;         
+        }        
+
+        let (func_name, _) = stringify!($func).rsplit_once("(").unwrap();
+
+        ic_utils::logger::log_message(format!("[{func_name}] used attempts: {attempts}"));
+
+        (result, is_unhedled_error)
     }}
 }
 
