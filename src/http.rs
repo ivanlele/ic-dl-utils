@@ -26,22 +26,24 @@ macro_rules! retry_with_unhandled {
 
         let mut is_unhandled_error = false;
 
-        while let Err(err) = result { 
-            let format_error = format!("{err:?}");
+        while result.is_err() { 
+            let format_error = format!("{:?}", result.as_ref().unwrap_err());
             if format_error.contains("Canister http responses were different across replicas") {
                 result = $func.await;
                 attempts += 1;
                 continue;
             }
-            if format_error.contraint("insufficient funds for gas * price + value")
-            is_unhandled_error = true;         
+
+            if format_error.contains("insufficient funds for gas * price + value") {
+                is_unhandled_error = true;
+            }
         }        
 
         let (func_name, _) = stringify!($func).rsplit_once("(").unwrap();
 
         ic_utils::logger::log_message(format!("[{func_name}] used attempts: {attempts}"));
 
-        (result, is_unhedled_error)
+        (result, is_unhandled_error)
     }}
 }
 
@@ -58,5 +60,7 @@ mod tests {
     #[tokio::test]
     async fn it_works() {
         let _ = retry_until_success!(test_func());
+        let (_, _) = retry_with_unhandled!(test_func());
     }
+    
 }
