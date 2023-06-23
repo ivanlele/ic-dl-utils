@@ -28,16 +28,18 @@ macro_rules! retry_with_unhandled {
 
         while result.is_err() { 
             let format_error = format!("{:?}", result.as_ref().unwrap_err());
+            ic_cdk::println!("{}", format_error);
+            if format_error.contains("insufficient funds for gas * price + value") {
+                is_unhandled_error = true;
+                break;
+            }
+            
             if format_error.contains("Canister http responses were different across replicas") {
                 result = $func.await;
                 attempts += 1;
                 continue;
             }
 
-            if format_error.contains("insufficient funds for gas * price + value") {
-                is_unhandled_error = true;
-            }
-            
             break;
         }        
 
