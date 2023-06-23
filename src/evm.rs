@@ -1,14 +1,10 @@
 use anyhow::{anyhow, Result, Context};
 
 use ic_web3::{Transport, types::{H256, TransactionReceipt}, Web3};
-use ic_cdk::api::time;
+
+use crate::time::time_in_seconds;
 
 const TX_SUCCESS_STATUS: u64 = 1;
-
-#[inline]
-pub fn time_in_seconds() -> u64 {
-    time() / 1_000_000_000
-}
 
 pub async fn wait_for_success_confirmation<T: Transport>(
     w3: &Web3<T>,
