@@ -40,6 +40,9 @@ pub async fn wait_for_confirmation<T: Transport>(
         }),
         context: vec![],
     }))
+    .cycles(None)
+    .max_resp(None)
+
     .build()
     .expect("failed to build call options");
     
